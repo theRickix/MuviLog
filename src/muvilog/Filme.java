@@ -85,7 +85,7 @@ public class Filme {
 			    String duracaotmp=rootobj.get("Runtime").getAsString();
 			    duracao=Integer.parseInt(duracaotmp.replaceAll(" min","")); //Retira "min" para tornar inteiro
 			    sinopse=rootobj.get("Plot").getAsString();
-			    sinopse=sinopse.replaceAll("'",""); //Apagar apostrofos para não causar problemas no SQL
+			    sinopse=sinopse.replaceAll("'","''"); //Apagar apostrofos para não causar problemas no SQL
 			    String posterext=rootobj.get("Poster").getAsString();
 			    if(posterext.equals("N/A")) { //Caso poster não exista, usar poster padrão
 			    	poster="./posters/desconhecido.jpg";
