@@ -101,7 +101,14 @@ public class JanelaAdicional extends JFrame {
 		
 		JLabel tipo = new JLabel("<html><b>Tipo:&nbsp;&nbsp;</b> "+new LigacaoBD().receberTipo(filme.tipo)+"</html>");
 		JLabel titulo = new JLabel("<html><b>Título:&nbsp;&nbsp;</b> "+filme.titulo+"</html>");
-		JLabel ano = new JLabel("<html><b>Ano:&nbsp;&nbsp;</b> "+filme.ano+"</html>");
+		JLabel ano;
+		if (filme.tipo==2) {
+			ano = new JLabel("<html><b>Ano:&nbsp;&nbsp;</b> "+filme.ano+"-"+filme.anofim+"</html>");
+		}
+		else {
+			ano = new JLabel("<html><b>Ano:&nbsp;&nbsp;</b> "+filme.ano+"</html>");
+		}
+			
 		JLabel duracao = new JLabel("<html><b>Duração:&nbsp;&nbsp;</b> "+filme.duracao+" min</html>");
 		JLabel generos = new JLabel("<html><b>Géneros:&nbsp;&nbsp;</b> "+new LigacaoBD().receberGeneros(filme.id)+"</html>");
 		JLabel paises = new JLabel("<html><b>Países:&nbsp;&nbsp;</b> "+new LigacaoBD().receberPaises(filme.id)+"</html>");

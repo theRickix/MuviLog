@@ -31,13 +31,14 @@ public class Filme {
 	String paises[];
 	String atores[];
 	String realizadores[];
+	int anofim;
 	
 	Filme() throws IOException {
 		
 	}
 	
 	public Filme(int id, String imdbid, String titulo, int ano, int duracao,
-			String sinopse, String poster, int metascore, float imdbrating,int tipo) throws IOException {
+			String sinopse, String poster, int metascore, float imdbrating,int tipo, int anofim) throws IOException {
 
 		this.id = id;
 		this.imdbid = imdbid;
@@ -49,6 +50,7 @@ public class Filme {
 		this.metascore = metascore;
 		this.imdbrating = imdbrating;
 		this.tipo = tipo;
+		this.anofim = anofim;
 	}
 	
 	public Boolean receberFilme(String tituloPesquisa,String anoPesquisa) throws IOException{
@@ -80,6 +82,7 @@ public class Filme {
 			    	String anos[];
 			    	anos = (rootobj.get("Year").getAsString()).split("–");
 			    	ano = Integer.parseInt(anos[0]);
+			    	anofim = Integer.parseInt(anos[1]);
 			    }
 			    
 			    String duracaotmp=rootobj.get("Runtime").getAsString();

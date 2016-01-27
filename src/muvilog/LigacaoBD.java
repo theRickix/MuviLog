@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
-
 public class LigacaoBD {
 	
 	//Estabelecer ligação à BD
@@ -19,7 +17,7 @@ public class LigacaoBD {
 	  
 		try {
 			Class.forName("org.h2.Driver");
-			con = DriverManager.getConnection("jdbc:h2:file:./videotecapessoal", "sa", "");
+			con = DriverManager.getConnection("jdbc:h2:file:./muvilogdb", "sa", "");
 			System.out.println("Ligação efetuada com sucesso.");
 		}
 		catch (ClassNotFoundException cnfe){
@@ -132,7 +130,7 @@ public class LigacaoBD {
 					+ "prateleira INTEGER);"
 			//Criar tabela de suportes físicos
 					+ "CREATE TABLE IF NOT EXISTS suportefisico("
-					+ "id INTEGER PRIMARY KEY REFERENCES suporte(id),"
+					+ "id INTEGER PRIMARY KEY REFERENCES suporte(id) ON DELETE CASCADE,"
 					+ "localizacao INTEGER REFERENCES unidadelocalizacao(id));"
 			//Criar tabela de emprestimo	
 					+ "CREATE TABLE IF NOT EXISTS emprestimo("
@@ -516,7 +514,7 @@ public class LigacaoBD {
 		try{
 			Statement stmt=con.createStatement();
 			//Receber filmes e as suas informações
-			String sql="SELECT * from filme";
+			String sql="SELECT * from filme LEFT JOIN serie ON filme.id=serie.id";
 			ResultSet rs= stmt.executeQuery(sql);
 			
 			while(rs.next()){				
@@ -530,7 +528,10 @@ public class LigacaoBD {
 				filme.poster=rs.getString("poster");
 				filme.metascore=rs.getInt("metascore");
 				filme.imdbrating=rs.getFloat("imdbrating");
-				filme.tipo=rs.getInt("tipo");				
+				filme.tipo=rs.getInt("tipo");
+				if(filme.tipo==2) {
+					filme.anofim=rs.getInt("anofim");
+				}
 				
 				filmes.add(filme);
 			}
@@ -603,7 +604,6 @@ public class LigacaoBD {
 			System.out.println(sql);
 			stmt.executeUpdate(sql);
 			
-			
 			sql="SELECT id FROM filme "
 					+ "WHERE imdbid='"+filme.imdbid+"';";
 			ResultSet rs= stmt.executeQuery(sql);
@@ -616,7 +616,13 @@ public class LigacaoBD {
 			this.ligarPaises((filme.id),filme.paises);
 			this.ligarPessoas(filme.id,filme.atores,0);
 			this.ligarPessoas(filme.id,filme.realizadores,1);
-
+			
+			if(filme.tipo==2) {
+				sql="INSERT INTO serie(id,anofim) VALUES "
+						+ "("+filme.id+","+filme.anofim+");";
+				System.out.println(sql);
+				stmt.executeUpdate(sql);
+			}
 		}
 		catch(SQLException sqle){
 			System.out.println("SQLException");
