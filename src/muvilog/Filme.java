@@ -9,9 +9,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -51,6 +53,72 @@ public class Filme {
 		this.imdbrating = imdbrating;
 		this.tipo = tipo;
 		this.anofim = anofim;
+	}
+	
+	public Filme(String imdbid, String titulo, int ano, int tipo) throws IOException {
+
+		this.imdbid = imdbid;
+		this.titulo = titulo;
+		this.ano = ano;
+		this.tipo = tipo;
+	}
+	
+	public Filme(String imdbid, String titulo, int ano, int tipo, int anofim) throws IOException {
+
+		this.imdbid = imdbid;
+		this.titulo = titulo;
+		this.ano = ano;
+		this.tipo = tipo;
+		this.anofim = anofim;
+	}
+	
+	//To implement into UI
+	public ArrayList<Filme> searchFilm(String search) throws IOException {
+		ArrayList<Filme> filmlist = new ArrayList<Filme>();
+		search=search.replaceAll(" ","+"); //Substituir espaços por +
+		String sURL = "http://www.omdbapi.com/?s="+search+"&r=json"; //Especificar link 
+		
+		//Conexão à página de internet
+	    URL url = new URL(sURL);
+	    HttpURLConnection request = (HttpURLConnection) url.openConnection();
+	    request.connect();
+	    //Utilização do plugin de JSON da Google
+	    JsonParser jp = new JsonParser(); 
+	    JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent(), "UTF-8")); 
+	    JsonObject rootobj = root.getAsJsonObject();
+	    Boolean response = rootobj.get("Response").getAsBoolean();
+	    System.out.println(response);
+	    JsonArray searchlist = rootobj.get("Search").getAsJsonArray();
+	   
+	    if(response==true) { //Se existir, recebe informações
+	    	for (int i = 0; i<searchlist.size();i++) {
+	    		JsonElement filmelem = searchlist.get(i);
+	    		JsonObject filmobj = filmelem.getAsJsonObject();
+	    		tipo = new LigacaoBD().verificarTipo(filmobj.get("Type").getAsString());
+			    System.out.println(tipo);
+			    if (tipo==0) break;
+		    	imdbid=filmobj.get("imdbID").getAsString();
+			    titulo=filmobj.get("Title").getAsString();
+			    System.out.println(titulo);
+			    if(tipo==1) {
+			    	 ano=filmobj.get("Year").getAsInt();
+			    	 filmlist.add(new Filme(imdbid,titulo,ano,tipo));
+			    }
+			    else {
+			    	System.out.println(filmobj.get("Year").getAsString());
+			    	String anos[];
+			    	anos = (filmobj.get("Year").getAsString()).split("–");
+			    	ano = Integer.parseInt(anos[0]);
+			    	System.out.println(ano);
+			    	if(anos.length>1)
+			    		anofim = Integer.parseInt(anos[1]);
+			    	else
+			    		anofim = 0;
+				    filmlist.add(new Filme(imdbid,titulo,ano,tipo,anofim));
+			    }
+	    	}
+	    }
+	    return filmlist;
 	}
 	
 	public Boolean receberFilme(String tituloPesquisa,String anoPesquisa) throws IOException{
